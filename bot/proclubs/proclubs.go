@@ -46,35 +46,32 @@ var routeEndpoints = map[route]string{
 	routeMatchesStats:		"clubs/matches",
 }
 
-func getEndpointResponseDecoder(r route, searchParams *url.Values) (*json.Decoder, error) {
-	var decoder *json.Decoder
-
+func getEndpointResponseData(r route, searchParams *url.Values, target any) (error) {
 	finalUrl := baseUrl + routeEndpoints[r] + "?" + searchParams.Encode()
 	request, err := http.NewRequest(method, finalUrl, nil)
 	if err != nil {
-		return decoder, err
+		return err
 	}
 	request.Header = headers
 
 	response, err := client.Do(request)
 	if err != nil {
-		return decoder, err
+		return err
 	}
-	response.Body.Close()
+	defer response.Body.Close()
 
 	var reader io.Reader
 	if strings.Contains(response.Header.Get("Content-Encoding"), "gzip") {
 		reader, err = gzip.NewReader(response.Body)
 		if err != nil {
-			return decoder, err
+			return err
 		}
 		defer reader.(*gzip.Reader).Close()
 	} else {
 		reader = response.Body
 	}	
 
-	decoder = json.NewDecoder(reader);
-	return decoder, nil
+	return json.NewDecoder(reader).Decode(target)
 }
 
 func SearchClub(clubName string, platform Platform) ([]Club, error) {
@@ -85,12 +82,7 @@ func SearchClub(clubName string, platform Platform) ([]Club, error) {
 		"platform": []string{PlatformString(platform)},
 	}
 
-	decoder, err := getEndpointResponseDecoder(routeClubSearch, &searchParams)
-	if err != nil {
-		return clubs, err
-	}
-
-	if err := decoder.Decode(&clubs); err != nil {
+	if err := getEndpointResponseData(routeClubSearch, &searchParams, &clubs); err != nil {
 		return clubs, err
 	}
 	
@@ -107,12 +99,7 @@ func GetMatchesStatsFromClubId(clubId string, platform Platform, matchType Match
 		"maxResultCount": []string{strconv.Itoa(count)},
 	}
 
-	decoder, err := getEndpointResponseDecoder(routeMatchesStats, &searchParams)
-	if err != nil {
-		return matchesStats, err
-	}
-
-	if err := decoder.Decode(&matchesStats); err != nil {
+	if err := getEndpointResponseData(routeMatchesStats, &searchParams, &matchesStats); err != nil {
 		return matchesStats, err
 	}
 
