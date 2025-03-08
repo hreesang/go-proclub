@@ -60,7 +60,7 @@ func getEndpointResponseDecoder(r route, searchParams *url.Values) (*json.Decode
 	if err != nil {
 		return decoder, err
 	}
-	// defer response.Body.Close()
+	response.Body.Close()
 
 	var reader io.Reader
 	if strings.Contains(response.Header.Get("Content-Encoding"), "gzip") {
