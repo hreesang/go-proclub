@@ -141,3 +141,49 @@ type MatchStastAggregate struct {
 	VproHackReason   int 		`json:"vprohackreason"`
 	Wins             int 		`json:"wins"`
 } 
+
+type ClubOverallStats struct {
+	ClubId                      string `json:"clubId"`
+	BestDivision                string `json:"bestDivision"`
+	BestFinishGroup             string `json:"bestFinishGroup"`
+	FinishesInDivision1Group1   string `json:"finishesInDivision1Group1"`
+	FinishesInDivision2Group1   string `json:"finishesInDivision2Group1"`
+	FinishesInDivision3Group1   string `json:"finishesInDivision3Group1"`
+	FinishesInDivision4Group1   string `json:"finishesInDivision4Group1"`
+	FinishesInDivision5Group1   string `json:"finishesInDivision5Group1"`
+	FinishesInDivision6Group1   string `json:"finishesInDivision6Group1"`
+	GamesPlayed                 string `json:"gamesPlayed"`
+	GamesPlayedPlayoff          string `json:"gamesPlayedPlayoff"`
+	Goals                       string `json:"goals"`
+	GoalsAgainst                string `json:"goalsAgainst"`
+	Promotions                  string `json:"promotions"`
+	Relegations                 string `json:"relegations"`
+	Losses                      string `json:"losses"`
+	Ties                        string `json:"ties"`
+	Wins                        string `json:"wins"`
+	LastMatch0                  string `json:"lastMatch0"`
+	LastMatch1                  string `json:"lastMatch1"`
+	LastMatch2                  string `json:"lastMatch2"`
+	LastMatch3                  string `json:"lastMatch3"`
+	LastMatch4                  string `json:"lastMatch4"`
+	LastMatch5                  string `json:"lastMatch5"`
+	LastMatch6                  string `json:"lastMatch6"`
+	LastMatch7                  string `json:"lastMatch7"`
+	LastMatch8                  string `json:"lastMatch8"`
+	LastMatch9                  string `json:"lastMatch9"`
+	LastOpponent0               string `json:"lastOpponent0"`
+	LastOpponent1               string `json:"lastOpponent1"`
+	LastOpponent2               string `json:"lastOpponent2"`
+	LastOpponent3               string `json:"lastOpponent3"`
+	LastOpponent4               string `json:"lastOpponent4"`
+	LastOpponent5               string `json:"lastOpponent5"`
+	LastOpponent6               string `json:"lastOpponent6"`
+	LastOpponent7               string `json:"lastOpponent7"`
+	LastOpponent8               string `json:"lastOpponent8"`
+	LastOpponent9               string `json:"lastOpponent9"`
+	WStreak                     string `json:"wstreak"`
+	UnbeatenStreak              string `json:"unbeatenstreak"`
+	SkillRating                 string `json:"skillRating"`
+	ReputationTier              string `json:"reputationtier"`
+	LeagueAppearances           string `json:"leagueAppearances"`
+}

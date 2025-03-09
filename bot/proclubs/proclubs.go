@@ -38,12 +38,16 @@ type route int
 
 const (
 	routeClubSearch		route = iota
-	routeMatchesStats	
+	routeMatchesStats
+	routeClubInfo
+	routeClubOverallStats
 )
 
 var routeEndpoints = map[route]string{
 	routeClubSearch:		"allTimeLeaderboard/search",
 	routeMatchesStats:		"clubs/matches",
+	routeClubInfo:			"clubs/info",
+	routeClubOverallStats:	"clubs/overallStats",
 }
 
 func getEndpointResponseData(r route, searchParams *url.Values, target any) (error) {
@@ -53,7 +57,6 @@ func getEndpointResponseData(r route, searchParams *url.Values, target any) (err
 		return err
 	}
 	request.Header = headers
-
 	response, err := client.Do(request)
 	if err != nil {
 		return err
@@ -74,8 +77,8 @@ func getEndpointResponseData(r route, searchParams *url.Values, target any) (err
 	return json.NewDecoder(reader).Decode(target)
 }
 
-func SearchClub(clubName string, platform Platform) ([]Club, error) {
-	var clubs []Club
+func SearchClub(clubName string, platform Platform) ([]*Club, error) {
+	var clubs []*Club
 
 	searchParams := url.Values{
 		"clubName": []string{clubName},
@@ -108,4 +111,34 @@ func GetMatchesStatsFromClubId(clubId string, platform Platform, matchType Match
 	}
 	
 	return matchesStats, nil
+}
+
+func GetClubInfo(clubId string, platform Platform) (*ClubInfo, error) {
+	var clubInfo *ClubInfo
+	
+	searchParams := url.Values{
+		"clubIds": []string{clubId},
+		"platform": []string{PlatformString(platform)},
+	}
+
+	if err := getEndpointResponseData(routeClubInfo, &searchParams, &clubInfo); err != nil {
+		return clubInfo, err
+	}
+	
+	return clubInfo, nil
+}
+
+func GetClubOverallStats(clubId string, platform Platform) (*ClubOverallStats, error) {
+	var clubsOverallStats []*ClubOverallStats
+	
+	searchParams := url.Values{
+		"clubIds": []string{clubId},
+		"platform": []string{PlatformString(platform)},
+	}
+
+	if err := getEndpointResponseData(routeClubOverallStats, &searchParams, &clubsOverallStats); err != nil {
+		return clubsOverallStats[0], err
+	}
+	
+	return clubsOverallStats[0], nil
 }

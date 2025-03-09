@@ -100,7 +100,18 @@ func onInteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	if cmd, exists := addedSlashCommands[i.ApplicationCommandData().Name]; exists {
+	appCmdData := i.ApplicationCommandData()
+	if cmd, exists := addedSlashCommands[appCmdData.Name]; exists {
+		var params string
+		for _, option := range appCmdData.Options {
+			if params == "" {
+				params = fmt.Sprintf(" %v", option.Value)
+			} else {
+				params = fmt.Sprintf("%v %v", params, option.Value)
+			}
+		}
+		utils.Log.Printf("'%v' executed a command: /%v%v", i.Member.User.Username, cmd.data.Name, params)
+
 		if err := cmd.execute(s, i); err != nil {
 			utils.Log.Printf("An error occured while executing slash command '%v':\n", cmd.data.Name)
 			utils.Log.Println(err)

@@ -60,8 +60,19 @@ func searchclub(s *dg.Session, i *dg.InteractionCreate) error {
 		}
 		return err
 	}
+	club := clubs[0]
+
+	clubOverallStats, err := proclubs.GetClubOverallStats(club.ClubId, platform); if err != nil {
+		errorMessage := "An error occured while retrieving the club information."
+		if _, interactionErr := s.InteractionResponseEdit(i.Interaction, &dg.WebhookEdit{
+			Content: &errorMessage,
+		}); interactionErr != nil {
+			return interactionErr
+		}
+		return err
+	}
 	
-	leagueMatchesStats, err := proclubs.GetMatchesStatsFromClubId(clubs[0].ClubId, platform, proclubs.MatchTypeLeague, 3)
+	leagueMatchesStats, err := proclubs.GetMatchesStatsFromClubId(club.ClubId, platform, proclubs.MatchTypeLeague, 3)
 	if err != nil {
 		errorMessasge := "An error occured, unable to retrieve the club's last matches."
 		if _, interactionErr := s.InteractionResponseEdit(i.Interaction, &dg.WebhookEdit{
@@ -72,7 +83,7 @@ func searchclub(s *dg.Session, i *dg.InteractionCreate) error {
 		return err
 	}
 	
-	playoffMatchesStats, err := proclubs.GetMatchesStatsFromClubId(clubs[0].ClubId, platform, proclubs.MatchTypePlayoff, 3)
+	playoffMatchesStats, err := proclubs.GetMatchesStatsFromClubId(club.ClubId, platform, proclubs.MatchTypePlayoff, 3)
 	if err != nil {
 		errorMessasge := "An error occured, unable to retrieve the club's last matches."
 		if _, interactionErr := s.InteractionResponseEdit(i.Interaction, &dg.WebhookEdit{
@@ -91,7 +102,7 @@ func searchclub(s *dg.Session, i *dg.InteractionCreate) error {
 
 	if _, err := s.InteractionResponseEdit(i.Interaction, &dg.WebhookEdit{
 		Embeds: &[]*dg.MessageEmbed{
-			clubMessageEmbed(&clubs[0], matchesStats),
+			clubMessageEmbed(club, clubOverallStats, matchesStats),
 		},
 	}); err != nil {
 		return err
@@ -100,7 +111,7 @@ func searchclub(s *dg.Session, i *dg.InteractionCreate) error {
 	return nil
 }
 
-func clubMessageEmbed(c *proclubs.Club, ms []*proclubs.MatchStats) *dg.MessageEmbed {
+func clubMessageEmbed(c *proclubs.Club, ovr *proclubs.ClubOverallStats, ms []*proclubs.MatchStats) *dg.MessageEmbed {
 	var platformName string
 	if platform, err := proclubs.StringToPlatform(c.Platform); err != nil {
 		platformName = "Unknown"
@@ -156,18 +167,18 @@ func clubMessageEmbed(c *proclubs.Club, ms []*proclubs.MatchStats) *dg.MessageEm
 				Inline:		true,
 			},
 			{
-				Name:		"Division",
-				Value: 		"Divison " + c.CurrentDivision,
+				Name:		"Best Division",
+				Value: 		"Divison " + ovr.BestDivision,
 				Inline: 	true,
 			},
 			{
 				Name:		"Games",
-				Value: 		fmt.Sprintf("%v Matches Played\n%vW %vL %vD", c.GamesPlayed, c.Wins, c.Loses,  c.Ties),
+				Value: 		fmt.Sprintf("%v Matches Played\n%vW %vL %vD\n%v Unbeaten Streak", ovr.GamesPlayed, ovr.Wins, ovr.Losses, ovr.Ties, ovr.UnbeatenStreak),
 				Inline: 	true,
 			},
 			{
 				Name:		"Club Stats",
-				Value: 		fmt.Sprintf("%v Goals Scored\n%v Goals Against\n%v Cleansheets", c.Goals, c.GoalsAgainst, c.CleanSheets),
+				Value: 		fmt.Sprintf("%v Goals Scored\n%v Goals Against\n%v Cleansheets", ovr.Goals, ovr.GoalsAgainst, c.CleanSheets),
 				Inline: 	true,
 			},
 			{
